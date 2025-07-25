@@ -10,14 +10,14 @@ import { User } from "../models/user.model.js";
 import { JWT_SECRET_KEY, JWT_EXPIRES_IN } from "../config/env.js";
 
 
-// -----------------signUp controller logic -----------------//
+  // -----------------signUp controller logic -----------------//
     export const signUp = async (req,res,next)=>{ 
 
 
         // client side will send the Data in the request body 
         // using the post method which allow to html Form to send data
         const {name, email, password, phone} = req.body;
-console.log(` mra apna costom error debug :::: name: ${name}, email: ${email}, password: ${password}, phone: ${phone}`);
+   console.log(` mra apna costom error debug :::: name: ${name}, email: ${email}, password: ${password}, phone: ${phone}`);
         // create database session to store the user data
         // and then save it to the database
        const startSession=  await mongoose.startSession()
@@ -45,27 +45,29 @@ console.log(` mra apna costom error debug :::: name: ${name}, email: ${email}, p
 
             // hash the password with the salt
             const hashedPassword = await bcrypt.hash(password,salt);
+            // console.log(` mra apna costom error debug :::: hashedPassword: ${hashedPassword}`);
 
             // create the user object
-            const user = new User({
-                name,
-                email,
-                password: hashedPassword,
-                phone
-            });
+            // const user = new User({
+            //    'name': name,
+            //    'email' : email,
+            //    'password' : hashedPassword,
+            //    'phone' : phone
+            // });
 
             // console.log(`mera apna costom error debug :::: user: ${user}`);
 
            
-           await startSession.commitTransaction
-           await startSession.endSession 
+          
 
 
 
  // save the user to the database
-            const savedUser = await User.create([{name,email,hashedPassword,phone}], { session: startSession });
+            const savedUser = await User.create([{name,email,password:hashedPassword,phone}], { session: startSession });
 
-            // console.log(` mra apna costom error debug :::: savedUser: ${savedUser}`);
+             await startSession.commitTransaction
+           await startSession.endSession 
+            console.log(` mra apna costom error debug :::: savedUser: ${savedUser}`);
 
             // console.log(`mera apna costom error debug :::: scerte key : ${JWT_SECRET_KEY} and expires in : ${JWT_EXPIRES_IN}`);
             // create a JWT token for the user
@@ -105,8 +107,106 @@ console.log(` mra apna costom error debug :::: name: ${name}, email: ${email}, p
 
 
         
-    }
+ }
 
-export const signIn = async (req,res,next)=>{ res.send({"title":"post sign-In controller logic here"}) }
+
+    // -----------------signIn controller logic -----------------//
+
+export const signIn = async (req,res,next)=>{ 
+
+
+                // signIn Logic 
+                // user send data through post req in body 
+                // extract the data from the request body
+                // const {email, password} = req.body;
+                // check is vailed entries 
+                // compare with database 
+                // hash password with bcrypt to compare with database
+                // if match then create a JWT token and send it to the user
+    
+
+     
+
+                const {email, password} = req.body;
+     // database ka session start krna hai 
+       const startSession = await mongoose.startSession();
+
+
+     try {
+
+        // start the transaction
+        await startSession.startTransaction
+           
+
+
+
+        // check if user with email exists 
+        const isUserExists = await User.findOne({"email":email}); // select the password field as well
+
+        
+        if(!isUserExists)
+        {
+            const error = new Error("User does not exists with this email");
+            error.statusCode = 404; // Not Found
+            throw error;
+        }
+
+        
+        // console.log(` mra apna costom error debug :::: isUserExists: ${isUserExists} and email: ${isUserExists.email}
+            // and  password: ${password}`);
+
+
+
+        // compare the password with the hashed password in the database
+        const isPasswordMatch = await bcrypt.compare(password, isUserExists.password);
+
+        if(isPasswordMatch === false){
+            const error = new Error("Invalid password");
+            error.statusCode = 401; // Unauthorized
+            throw error;
+        }
+
+
+
+        // create a JWT token for the user
+        const token = jwt.sign(
+            {userId: isUserExists._id, email: isUserExists.email},
+            JWT_SECRET_KEY,
+            {expiresIn: JWT_EXPIRES_IN}
+        )
+
+        // commit the transaction
+        await startSession.commitTransaction
+        await startSession.endSession
+
+
+        // send the response to the user
+        res.status(200).json({
+            "message": "User Signed in Successfully",
+            "data": {
+                user: {
+                    id: isUserExists._id,
+                    name: isUserExists.name,
+                    email: isUserExists.email,
+                    phone: isUserExists.phone
+                },
+                token
+            }
+        })
+
+        // 
+        
+     } catch (error) {
+
+        await startSession.abortTransaction
+        await startSession.endSession
+        return next(error);
+
+        
+     }
+
+
+
+ }
 
 export const signOut = async (req,res,next)=>{ res.send({"title":"get sign-out controller logic here"}) }

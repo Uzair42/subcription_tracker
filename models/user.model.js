@@ -32,9 +32,9 @@ match: [/.+\@.+\..+/,"galta hai bhai email address sahi daal"],
     },
     password:{
         type:String,
-        required:[false,"Password is required"],
+
+        required:[true,"Password is required"],
         minlength:6,
-        select:false // This will not return the password in the response
 
     },
     phone:{
