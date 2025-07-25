@@ -1,7 +1,7 @@
-import { Mongoose } from "mongoose";   
+import mongoose from "mongoose";   
 
 
-const subscriptionSchema = new Mongoose.Schema({
+const subscriptionSchema = new mongoose.Schema({
     userId: {
         type: Mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -108,4 +108,4 @@ subscriptionSchema.pre('save', function(next) {
 
 
 // Export the subscription model
-export const Subscription = Mongoose.model('Subscription', subscriptionSchema);
+export const Subscription = mongoose.model('Subscription', subscriptionSchema);

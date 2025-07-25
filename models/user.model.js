@@ -1,7 +1,7 @@
-import { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 
 
-const userSchema=new Mongoose.Schema(
+const userSchema= new mongoose.Schema(
 {
     name:{
         type:String,
@@ -18,20 +18,32 @@ const userSchema=new Mongoose.Schema(
         unique:[true,"Email already exists"],
         trim:true,
         lowercase:true,
-        match: [/\S+@\S\.\S/,"please enter a valid email address"],
+        // match: [ /\S+@\S\.\S/,"please enter a valid email address"],
+match: [/.+\@.+\..+/,"galta hai bhai email address sahi daal"],
+
+    //      validate: {
+    //   validator: function(value) {
+    //     // Regular expression for basic email format validation
+    //     return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value); 
+    //   },
+    //   message: 'Invalid email address format'
+    // }
     
     },
     password:{
         type:String,
-        required:[true,"Password is required"],
+        required:[false,"Password is required"],
         minlength:6,
         select:false // This will not return the password in the response
 
     },
-    createdAt:{
-        type:Date,
-        default:Date.now
-    }
+    phone:{
+        type:String,
+        required:[true,"Phone number is required"],
+        unique:true,
+        trim:true,
+        // match: [/^\d{10}$/,"Please enter a valid phone number"]
+    },
 },{
     timestamps:true
 }
@@ -40,4 +52,4 @@ const userSchema=new Mongoose.Schema(
 
 
 // Export the user model
-export const User = Mongoose.model('User', userSchema);
+export const User = mongoose.model('User', userSchema);
