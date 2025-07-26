@@ -8,6 +8,7 @@ import { authRouter } from './routes/auth.routes.js';
 import {userRouter} from './routes/user.routes.js'
 import {subscriptionRouter} from './routes/subscription.routes.js'
 import errorMiddleware from './middleware/error.middleware.js';
+import archjetMiddleware from './middleware/archjetMiddleware.js'; 
 
 
 
@@ -31,6 +32,7 @@ app.get('/', (req, res) => {
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended : false}))
+app.use(archjetMiddleware); // Use Arcjet middleware for rate limiting and bot protection
 
 
 
@@ -40,6 +42,7 @@ app.use(express.urlencoded({extended : false}))
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/user',userRouter);
 app.use('/api/v1/subscription',subscriptionRouter);
+
 
 app.use(errorMiddleware)
 
