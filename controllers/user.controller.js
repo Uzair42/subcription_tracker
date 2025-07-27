@@ -10,7 +10,7 @@ export const getAllUsers = async (req, res,next) => {
 
     const users = await User.find().select("-password");
     res.status(200).send({
-      message: "Get all users logic here",
+      message: "Get all users  here",
       data: users,
     });
 
@@ -38,7 +38,7 @@ export const getUserById= async (req,res,next) => {
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }
-    res.status(200).send({ message: "Get user by ID logic here", data: user });
+    res.status(200).send({ message: "Get user by ID  here", data: user });
   } catch (error) {
     next(error);
   }
@@ -47,6 +47,34 @@ export const getUserById= async (req,res,next) => {
 
 export const createUser = async (req,res, next) => {
   const userData=req.body;
+  try {
+    
+    // hash the password before saving
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    userData.password = hashedPassword;
+
+    // create a new user
+    const newUser = new User(userData);
+    
+    // save the user to the database
+    const savedUser = await newUser.save();
+
+    res.status(201).send({
+      message: "User created successfully",
+      data: savedUser,
+    });
+    
+
+    if (!savedUser) {
+      return res.status(400).send({ message: "Failed to create user" });
+    }
+
+
+
+  } catch (error) {
+    next(error);
+    
+  }
   
 }
 

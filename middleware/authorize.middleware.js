@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import {User} from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET_KEY } from '../config/env.js'; 
+import { Blacklist } from '../models/blacklist.model.js';
 
 
 // plan sada hy ,, iss middleware ko use krna hy 
@@ -27,6 +28,9 @@ export const authorizeMiddleware = async (req , res , next ) => {
 
     try {
 
+        
+
+        
         // Get the token from the request headers
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -38,6 +42,21 @@ export const authorizeMiddleware = async (req , res , next ) => {
             return res.status(401).json({ message: 'No token provided, authorization denied' });
         }
 
+        try{
+ const compareToken = await Blacklist.findOne({ token  });
+
+ console.log("Apna debug method compareToken:", compareToken);
+ console.log("Apna debug method Token:", token);
+
+        if ( compareToken !=null &&  compareToken.token.toString() == token.toString()) {
+            return res.status(401).json({ message: 'Token is Invaild, please sign in again' });
+        }
+         
+        } catch (error) {
+            return res.status(500).json({ message: 'Error checking token validity' });
+        }
+
+       
         // Verify the token
         let decoded;
         try {

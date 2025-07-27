@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt';
 
 import { User } from "../models/user.model.js"; 
 import { JWT_SECRET_KEY, JWT_EXPIRES_IN } from "../config/env.js";
+import { Blacklist } from "../models/blacklist.model.js";
 
 
   // -----------------signUp controller logic -----------------//
@@ -211,7 +212,35 @@ export const signIn = async (req,res,next)=>{
 
 export const signOut = async (req,res,next)=>{ 
     
-    
-   //sign out logic here 
+  try {
+    // get the user id from the request
+    const userId = req.user.id; // Assuming you have middleware that sets req.user
+    // get token from the request header 
 
+    const token = req.headers.authorization?.split(' ')[1]; // Assuming the token is sent in the Authorization header
+    // verify the token
+    if (!token) {
+      return res.status(401).json({ message: 'sign-out, please sign in again' });
+    }
+
+    //add token to blacklist schema 
+   const blockToken = await Blacklist.create({
+      token
+    });
+
+    if (!blockToken) {
+      return res.status(500).json({ message: 'Failed to sign out' });
+      
+    }   
+
+    
+
+    res.status(200).json({ message: 'User signed out successfully' });
+
+    
+  } catch (error) {
+    return next(error);
+    
+  }
+    
 }

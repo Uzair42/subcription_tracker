@@ -28,7 +28,7 @@ try {
     if (!subscription) {
         return res.status(404).json({ message: 'Subscription not found' });
     }
-    res.status(200).json({ message: 'Get subscription by ID logic here', data: subscription });
+    res.status(200).json({ message: 'Get subscription by ID is  here', data: subscription });
 
     
 } catch (error) {
@@ -118,7 +118,7 @@ try {
         return res.status(404).json({ message: 'No subscriptions found for this user' });
     }
 
-    res.status(200).json({ message: 'Get user subscriptions logic here', data: userSubscriptions });
+    res.status(200).json({ message: 'Get user subscriptions  here', data: userSubscriptions });
 
     
 } catch (
@@ -168,7 +168,7 @@ try {
         return res.status(404).json({ message: 'No upcoming subscriptions found' });
     }
 
-    res.status(200).json({ "message": "Upcoming renewal subscriptions logic here", data: upcomingSubscriptions });
+    res.status(200).json({ "message": "Upcoming renewal subscriptions are here", data: upcomingSubscriptions });
     
 } catch (error) {
     next(error); // Pass the error to the error handling middleware

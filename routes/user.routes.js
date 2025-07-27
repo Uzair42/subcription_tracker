@@ -6,16 +6,16 @@ import {authorizeMiddleware} from '../middleware/authorize.middleware.js';
 
 const userRouter=Router();
 
-userRouter.get('/',getAllUsers)
+userRouter.get('/',authorizeMiddleware,getAllUsers)
 
 userRouter.get('/:id',authorizeMiddleware,getUserById)
 
-userRouter.post('/',(req,res)=> res.send({'title':"Create new User"}))
+userRouter.post('/',authorizeMiddleware,createUser)
 
-userRouter.put('/:id', updateUser)
+userRouter.put('/:id',authorizeMiddleware, updateUser)
 
 
-userRouter.delete('/:id',deleteUser)
+userRouter.delete('/:id',authorizeMiddleware,deleteUser)
 
 
 
