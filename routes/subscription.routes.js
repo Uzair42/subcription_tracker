@@ -1,6 +1,17 @@
 import { Router } from "express";
 
 const subscriptionRouter=Router()
+import {createSubscription} from '../controllers/subscription.controller.js';
+import {
+getAllSubscriptions,
+getSubscriptionById,
+updateSubscription,
+deleteSubscription,
+getUserSubscriptions,
+cancelSubscription,
+upcomingRenewalSubscriptions
+} from '../controllers/subscription.controller.js';
+import { authorizeMiddleware } from "../middleware/authorize.middleware.js";
 
 // for subscription i have to deal with all use case of my api endponts
 
@@ -12,31 +23,31 @@ const subscriptionRouter=Router()
 // delete subscription uisng :id 
 
 
+subscriptionRouter.get('/upcomingrenewal',authorizeMiddleware,upcomingRenewalSubscriptions)
 
-subscriptionRouter.get('/',(req,res)=> res.send({"title":"get all subscriptions "}))
+subscriptionRouter.get('/',authorizeMiddleware,getAllSubscriptions)
 
-subscriptionRouter.get('/:id',(req,res)=> res.send({"title":"get id subscriptions "}))
+subscriptionRouter.get('/:id',authorizeMiddleware, getSubscriptionById)
 
-subscriptionRouter.post('/',(req,res)=> res.send({"title":"Create new subscriptions "}))
+subscriptionRouter.post('/',authorizeMiddleware, createSubscription)
 
-subscriptionRouter.put('/:id',(req,res)=> res.send({"title":"update id subscriptions "}))
+subscriptionRouter.put('/:id',authorizeMiddleware, updateSubscription)
 
-subscriptionRouter.delete('/:id',(req,res)=> res.send({"title":"delete id subscriptions "}))
+subscriptionRouter.delete('/:id',authorizeMiddleware, deleteSubscription)
 
 
 // get subscription link to spacific user/:id 
 
-subscriptionRouter.get('/user/:id',(req,res)=> res.send({"title":"get all subscriptions "}))
+subscriptionRouter.get('/user/:id',authorizeMiddleware,getUserSubscriptions)
 
 // Cancel all Subscriptions 
 // cancel all subscriptions those for id ,,, no more pay
 
-subscriptionRouter.put('/:id/cancel',(req,res)=>res.send({"title":"Cancel Subscription"}))
+subscriptionRouter.put('/:id/cancel',authorizeMiddleware,cancelSubscription)
 
 // upcoming Subscription
 //  those subscritpion which going to end soon 
 
-subscriptionRouter.put('/upcomingrenewal',(req,res)=>res.send({"title":"Upcoming  renewal  Subscription"}))
 
 
 export  {subscriptionRouter};

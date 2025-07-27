@@ -1,9 +1,10 @@
 import mongoose from "mongoose";   
 
 
-const subscriptionSchema = new mongoose.Schema({
+const subscriptionSchema = new mongoose.Schema(
+    {
     userId: {
-        type: Mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
         index: true
@@ -38,7 +39,7 @@ const subscriptionSchema = new mongoose.Schema({
 
     frequency: {
         type: String,
-        enum: ['Daily','weekly','monthly', 'yearly'],
+        enum: ['daily','weekly','monthly', 'yearly'],
         required: [true, "Subscription frequency is required"],
         default: 'monthly'
     },
@@ -65,44 +66,62 @@ const subscriptionSchema = new mongoose.Schema({
     
     startDate: {
         type: Date,
-        required: [true, "Subscription start date is required"],
-        validate:{
+        default: Date.now,
+        required: [false, "Subscription start date is required"],
+        validator:{
             validate:(value)=> value <= new Date(),
             message: "Start date must be in the past"
         }
     },
-    renewalDate: {
-        type: Date,
-        required: [true, "Subscription renewal date is required"],
-        validate:{
-            validate:function (value){return value > this.startDate()},
-            message: "RenewalDate must be after start date"
-        }
-    },
+   renewalDate: {
+    type: Date,
+    validate: {
+        validator: function (value) {
+            return value > this.startDate; 
+        },
+        message: "RenewalDate must be after start date"
+    }
+},
     
     
 }, {
     timestamps: true
-});
+}
+);
 
 
 // Auto calculating the renewal databased on frequency
 
 subscriptionSchema.pre('save', function(next) {
-    const renewalFrequency = this.frequency;
-    const startDate = this.startDate;   
-    const renewalDate = new Date(startDate.getTime() + (renewalFrequency * 30 * 24 * 60 * 60 * 1000)); // Assuming frequency is in days, weeks, months, or years
-})
+    if (!this.renewalDate && this.startDate && this.frequency) {
+        let renewalDate = new Date(this.startDate);
+        switch (this.frequency) {
+            case 'daily':
+                renewalDate.setDate(renewalDate.getDate() + 1);
+                break;
+            case 'weekly':
+                renewalDate.setDate(renewalDate.getDate() + 7);
+                break;
+            case 'monthly':
+                renewalDate.setMonth(renewalDate.getMonth() + 1);
+                break;
+            case 'yearly':
+                renewalDate.setFullYear(renewalDate.getFullYear() + 1);
+                break;
+        }
+        this.renewalDate = renewalDate;
+    }
 
-// AUTO UPDATE STATUS IF RENEWAL DATE IS PASSED
-subscriptionSchema.pre('save', function(next) {
-    const currentDate = new Date();
+        const currentDate = new Date();
+
     if (this.renewalDate < currentDate && this.status !== 'cancelled')
     {
         this.status = 'expired'; // Automatically set status to inactive if renewal date has passed        
     }
     next();
 });
+
+
 
 
 

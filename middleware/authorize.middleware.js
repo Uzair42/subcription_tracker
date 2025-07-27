@@ -60,9 +60,10 @@ export const authorizeMiddleware = async (req , res , next ) => {
 
         // Attach user to the request object for further use
         req.user = user;
+        console.log("Apna debugg tariqa kar  request.usre object ::::\n ", req.user);
 
         // Optionally, restrict access to own profile only
-        if (req.params.id && req.params.id !== user.id.toString()) {
+        if (req.user.id && req.user.id !== user._id.toString()) {
             return res.status(403).json({ message: 'Access denied to other user profiles' });
         }
 

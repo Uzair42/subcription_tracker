@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended : false}))
-app.use(archjetMiddleware); // Use Arcjet middleware for rate limiting and bot protection
+app.use(archjetMiddleware); 
 
 
 

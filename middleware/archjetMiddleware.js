@@ -6,7 +6,7 @@ const archjetMiddleware = async (req , res , next ) => {
 
     try {
 
-         const decision = await aj.protect(req, { requested: 5 }); // Deduct 5 tokens from the bucket
+         const decision = await aj.protect(req, { requested: 2 }); // Deduct 5 tokens from the bucket
          console.log("Arcjet decision", decision);
 
                 if (decision.isDenied()) {

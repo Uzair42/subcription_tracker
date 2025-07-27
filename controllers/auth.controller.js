@@ -209,4 +209,9 @@ export const signIn = async (req,res,next)=>{
 
  }
 
-export const signOut = async (req,res,next)=>{ res.send({"title":"get sign-out controller logic here"}) }
+export const signOut = async (req,res,next)=>{ 
+    
+    
+   //sign out logic here 
+
+}
