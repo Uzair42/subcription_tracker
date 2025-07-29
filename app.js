@@ -1,17 +1,18 @@
 import express, { urlencoded } from 'express';
 import {connectToDatabase} from './db/mongoosdb.js'; // Import the database connection function
-import {PORT} from './config/env.js'; // Import your env loader 
+import {PORT, RECEIVER_EMAIL} from './config/env.js'; // Import your env loader 
 import cookieParser from 'cookie-parser';
 //import the Routes form Folder / files 
+import { sendEmail } from './utils/sendEmail.js';
 
 import { authRouter } from './routes/auth.routes.js';
 import {userRouter} from './routes/user.routes.js'
 import {subscriptionRouter} from './routes/subscription.routes.js'
 import errorMiddleware from './middleware/error.middleware.js';
 import archjetMiddleware from './middleware/archjetMiddleware.js'; 
+// import {workflowRouter} from './routes/workflow.routes.js'; // 
 
-
-
+import "./jobs/renewalEmailJob.js";
 
 const app = express();
 
@@ -42,18 +43,28 @@ app.use(archjetMiddleware);
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/user',userRouter);
 app.use('/api/v1/subscription',subscriptionRouter);
+// app.use('/api/v1/workflow', workflowRouter); 
 
 
 app.use(errorMiddleware)
 
 
 
+import { emailTempHtml } from './utils/email.temp.js';
 
-app.listen(PORT, ()=> {
+
+
+app.listen(PORT, async ()=> {
 
   console.log(`Server is running on http://localhost:${PORT}`);
 
-  
+   await sendEmail({
+            to: RECEIVER_EMAIL,
+            subject: "Your Subscription Tracker API   Server is  STARTED!",
+            text: `Hi Muhammad Uzair, your subscription "name" will renew at 12.12-2026.`,
+            html: emailTempHtml
+          });
+    
  
   connectToDatabase(); // Call the function to connect to the database
  
